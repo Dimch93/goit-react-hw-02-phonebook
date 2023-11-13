@@ -1,6 +1,8 @@
 import { Component } from 'react';
-import { Phonebook } from './Phonebook/Phonebook';
-import { Contacts } from './Contacts/Contacts';
+import PhonebookForm from './PhonebookForm/PhonebookForm';
+import { ContactsList } from './ContactsList/ContactsList';
+import { nanoid } from 'nanoid';
+import { Filter } from './Filter/Filter';
 
 class App extends Component {
   state = {
@@ -10,19 +12,60 @@ class App extends Component {
       { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
       { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
     ],
-    name: '',
-    number: '',
+    filter: '',
+  };
+
+  addContacts = newContacts => {
+    const contactsObj = {
+      ...newContacts,
+      id: nanoid(),
+    };
+    if (contactsObj) {
+      alert(`${newContacts.name} is already in contacts`);
+      return;
+    }
+    this.setState(prev => ({
+      contacts: [...prev.contacts, contactsObj],
+    }));
+  };
+
+  deleteContacts = id => {
+    this.setState(prev => ({
+      contacts: prev.contacts.filter(el => el.id !== id),
+    }));
+  };
+
+  changeFilter = event => {
+    this.setState({ filter: event.target.value });
+  };
+
+  getVisibleContacts = () => {
+    const { filter, contacts } = this.state;
+    const normalizedFilter = filter.toLowerCase();
+
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(normalizedFilter)
+    );
   };
 
   render() {
+    const visibleContacts = this.getVisibleContacts();
+    const { filter } = this.state;
     return (
       <>
         <div>
           <h1>Phonebook</h1>
-          <Phonebook />
-        </div>
-        <div>
-          <Contacts />
+          <PhonebookForm addContacts={this.addContacts} />
+          <h2>Contacts</h2>
+          {this.state.contacts.length > 0 ? (
+            <Filter value={filter} onChangeFilter={this.changeFilter} />
+          ) : (
+            <p>Your phonebook is empty. Add first contact!</p>
+          )}
+          <ContactsList
+            contacts={visibleContacts}
+            deleteContacts={this.deleteContacts}
+          />
         </div>
       </>
     );
