@@ -27,7 +27,7 @@ class App extends Component {
       contact => contact.name === name
     );
     if (nameContact) {
-      return alert(`${name} is already in contacts.`);
+      return alert(`${name} is already in contacts!!!`);
     }
 
     this.setState(prev => ({
